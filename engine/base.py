@@ -51,10 +51,7 @@ class DataContainerMixin:
     COUNTRY_PATTERN = re.compile(r'(ук.*на)', re.IGNORECASE)
 
     def parse_topic_id(self, path: str) -> int:
-        try:
-            return int(re.sub(self.TOPIC_ID_PATTERN, '', path.rsplit('&', 1)[1]))
-        except IndexError:
-            x = 10
+        return int(re.sub(self.TOPIC_ID_PATTERN, '', path.rsplit('&', 1)[1]))
 
 
 @dataclass
@@ -73,10 +70,12 @@ class TopicMetaInfo(DataContainerMixin):
     page_index: Optional[int] = None
     topic_id: Optional[int] = None
     topic_content: Optional[str] = None
+    processed: bool = False
 
     def process(self) -> None:
         relative_path = self.url.split('.', 1)[1].rsplit('&', 1)[0]
         self.url = f'{self.domain}{relative_path}'
+        self.title = self.title.split(']')[1].strip()
         self.posts_count = int(self.posts_count.strip())
         self.views_count = int(self.views_count.strip())
         self.last_post_timestamp = datetime.strptime(self.last_post_timestamp, '%Y-%m-%dT%H:%M:%S%z')
@@ -113,6 +112,23 @@ class TopicMetaInfo(DataContainerMixin):
             self.location = validate_location(location_name)
         else:
             self.location = None
+
+        self.processed = True
+
+    def to_json(self):
+        if self.processed:
+            return {
+                'topic_id': self.topic_id,
+                'url': self.url,
+                'title': self.title,
+                'posts_count': self.posts_count,
+                'views_count': self.views_count,
+                'last_post_timestamp': self.last_post_timestamp,
+                'location_raw': self.location_raw,
+                'location': self.location,
+                'topic_content': self.topic_content
+            }
+        raise AttributeError('Values was not processed. Call process method.')
 
 
 @dataclass
