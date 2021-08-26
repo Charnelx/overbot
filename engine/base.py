@@ -75,7 +75,6 @@ class TopicMetaInfo(DataContainerMixin):
     def process(self) -> None:
         relative_path = self.url.split('.', 1)[1].rsplit('&', 1)[0]
         self.url = f'{self.domain}{relative_path}'
-        self.title = self.title.split(']')[1].strip()
         self.posts_count = int(self.posts_count.strip())
         self.views_count = int(self.views_count.strip())
         self.last_post_timestamp = datetime.strptime(self.last_post_timestamp, '%Y-%m-%dT%H:%M:%S%z')
@@ -112,6 +111,8 @@ class TopicMetaInfo(DataContainerMixin):
             self.location = validate_location(location_name)
         else:
             self.location = None
+
+        self.title = self.title.split(']')[1].strip()
 
         self.processed = True
 
