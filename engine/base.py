@@ -71,6 +71,7 @@ class TopicMetaInfo(DataContainerMixin):
     topic_id: Optional[int] = None
     topic_content: Optional[str] = None
     processed: bool = False
+    closed: bool = False
 
     def process(self) -> None:
         relative_path = self.url.split('.', 1)[1].rsplit('&', 1)[0]
@@ -118,18 +119,27 @@ class TopicMetaInfo(DataContainerMixin):
 
     def to_json(self):
         if self.processed:
-            return {
+            base_data = {
                 'topic_id': self.topic_id,
-                'url': self.url,
-                'title': self.title,
                 'posts_count': self.posts_count,
                 'views_count': self.views_count,
                 'last_post_timestamp': self.last_post_timestamp,
+                'updated': datetime.now(),
+            }
+            if self.closed:
+                # avoid updating topic data when topic is closed
+                # since usually author remove all topic content
+                return base_data
+
+            base_data.update({
+                'url': self.url,
+                'title': self.title,
                 'location_raw': self.location_raw,
                 'location': self.location,
                 'topic_content': self.topic_content,
-                'updated': datetime.now()
-            }
+                'closed': self.closed
+            })
+            return base_data
         raise AttributeError('Values was not processed. Call process method.')
 
 
@@ -139,6 +149,7 @@ class TopicData(DataContainerMixin):
     content: str
     url: str
     topic_id: Optional[int] = None
+    closed: bool = False
 
     def process(self) -> None:
         self.topic_id = self.parse_topic_id(path=self.url)

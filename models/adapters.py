@@ -55,6 +55,8 @@ class TopicsToDBAdapter:
         ]
 
         operations = field_update_operations
-        result = Topic._get_collection().bulk_write(operations)
+        result = None
+        if operations:
+            result = Topic._get_collection().bulk_write(operations)
 
         return result

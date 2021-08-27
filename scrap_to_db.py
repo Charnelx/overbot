@@ -4,7 +4,7 @@ from scrapper.models.adapters import Topic, TopicsToDBAdapter
 
 if __name__ == '__main__':
     scrapper = OverclockersScrapper()
-    topics = scrapper.get_topics(1, 5)
+    topics = scrapper.get_topics(1, 6)
 
     adapter = TopicsToDBAdapter()
     adapter.connect()
@@ -18,10 +18,14 @@ if __name__ == '__main__':
     for topic in topics_data:
         topic_meta = topics_mapping.get(topic.topic_id)
         topic_meta.topic_content = topic.content
+        topic_meta.closed = topic.closed
 
     result = adapter.import_topics_to_db(list(topics_mapping.values()))
-    modified_records = result.modified_count
-    upserted_records = result.upserted_count
-    inserted_records = result.inserted_count
+    if result:
+        modified_records = result.modified_count
+        upserted_records = result.upserted_count
+        inserted_records = result.inserted_count
 
-    print(f'Modified: {modified_records}\nUpserted: {upserted_records}\nInserted: {inserted_records}')
+        print(f'Modified: {modified_records}\nUpserted: {upserted_records}\nInserted: {inserted_records}')
+    else:
+        print('No updates')

@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from mongoengine.queryset import Q, QuerySet
 
 
@@ -16,13 +18,16 @@ class AuthorQuerySet(QuerySet):
 
 class TopicQuerySet(QuerySet):
 
-    def fetch_excluded_topics(self, max_posts_count: int = 15, max_views_count: int = 2000):
+    def fetch_excluded_topics(
+            self, max_posts_count: int = 15, max_views_count: int = 2000, time_limit: int = 15
+    ):
         """
         Return Topic ID's that needs to be excluded (no requests for topic page content scrapping)
         """
         return self.filter(
-            Q(posts_count__gte=max_posts_count) or
-            Q(views_count__gte=max_views_count) or
-            Q(closed=True) or
+            Q(posts_count__gte=max_posts_count) |
+            Q(views_count__gte=max_views_count) |
+            Q(updated__gte=datetime.now() - timedelta(minutes=time_limit)) |
+            Q(closed=True) |
             Q(location=None)
         ).only('topic_id')

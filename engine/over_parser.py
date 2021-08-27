@@ -44,10 +44,12 @@ class OverclockersParser:
     def parse_topic_content(self, page_content: str, url: str):
         root = HTMLParser(page_content)
         topic_content = root.css_first('.bg1 > .inner > .postbody > * > .content').text()
+        topic_closed = bool(root.css_first('.fa-lock'))
 
         data_container = TopicData(
             content=topic_content,
-            url=url
+            url=url,
+            closed=topic_closed
         )
 
         data_container.process()
