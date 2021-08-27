@@ -127,7 +127,8 @@ class TopicMetaInfo(DataContainerMixin):
                 'last_post_timestamp': self.last_post_timestamp,
                 'location_raw': self.location_raw,
                 'location': self.location,
-                'topic_content': self.topic_content
+                'topic_content': self.topic_content,
+                'updated': datetime.now()
             }
         raise AttributeError('Values was not processed. Call process method.')
 

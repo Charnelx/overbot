@@ -1,3 +1,4 @@
+import datetime
 from collections import defaultdict
 from typing import List
 
@@ -37,13 +38,23 @@ class TopicsToDBAdapter:
 
             for topic in topic_list:
                 topic_data = topic.to_json()
-                topic_data['author'] = author_record
-                topics_bulk.append(Topic(**topic_data))
+                topic_data['author'] = author_record.id
+                topics_bulk.append(topic_data)
 
-        # bulk upsert/update
-        operations = [
-            pymongo.ReplaceOne({'topic_id': topic.topic_id}, topic.to_mongo(), upsert=True)
-            for topic in topics_bulk
+        field_update_operations = [
+            pymongo.UpdateOne(
+                {'topic_id': topic['topic_id']},
+                {
+                    '$set': topic,
+                    '$setOnInsert': {
+                        'created': datetime.datetime.now()
+                    }
+                },
+                upsert=True
+            ) for topic in topics_bulk
         ]
+
+        operations = field_update_operations
         result = Topic._get_collection().bulk_write(operations)
+
         return result

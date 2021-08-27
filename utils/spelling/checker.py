@@ -86,6 +86,7 @@ def validate_location(location: str):
 
     possible_locations = []
     # naive and straightforward hack to determine language
+    # TODO: use regex functionality
     if 'і' in location or 'є' in location or 'ї' in location:
         locations_dict = load_ua_ru_location_names()
         matched_location = locations_dict.get(location)
