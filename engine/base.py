@@ -10,15 +10,23 @@ from scrapper.utils.spelling.checker import validate_location
 
 
 class BaseScraper(ABC):
+    """
+    This class define two class attributes that should be
+    defined in subclasses that inherit from this class.
+    Example:
+        class Scrapper(BaseScrapper):
+            HOST = ''
+            DOMAIN = ''
+    """
 
     @property
     @abstractmethod
-    def HOST(self) -> str:  # noqa: N802
+    def HOST(self) -> str:  # pylint: disable=invalid-name
         pass
 
     @property
     @abstractmethod
-    def DOMAIN(self) -> str:  # noqa: N802
+    def DOMAIN(self) -> str:  # pylint: disable=invalid-name
         pass
 
 
@@ -27,7 +35,7 @@ class ScrapperMixin(BaseScraper):
     HOST = ''
     DOMAIN = ''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self._ua = FakeUserAgent()
 
     @property
@@ -45,7 +53,7 @@ class ScrapperMixin(BaseScraper):
         return headers
 
 
-class DataContainerMixin:
+class DataContainerMixin:  # pylint: disable=too-few-public-methods
 
     TOPIC_ID_PATTERN = re.compile(r'\D+', re.IGNORECASE)
     COUNTRY_PATTERN = re.compile(r'(ук.*на)', re.IGNORECASE)
@@ -83,7 +91,7 @@ class TopicMetaInfo(DataContainerMixin):
         self.author_profile_link = self.author_profile_link.split('.', 1)[1].rsplit('&', 1)[0]
         self.author_profile_link = f'{self.domain}{self.author_profile_link}'
 
-        location_pair = self.title.split(']')[0].strip('[').split(',')
+        location_pair = self.title.split(']', maxsplit=1)[0].strip('[').split(',')
         self.location_raw = ','.join(location_pair)
         location_length = len(location_pair)
 

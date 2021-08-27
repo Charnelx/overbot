@@ -23,7 +23,8 @@ class TopicsToDBAdapter:
             port=db_settings.get('port')
         )
 
-    def import_topics_to_db(self, topics: List[TopicMetaInfo]):
+    @staticmethod
+    def import_topics_to_db(topics: List[TopicMetaInfo]):
         authors_mapping = defaultdict(list)
         # trick for optimization - allows to create/update author
         # only one's for a group of topics
@@ -32,7 +33,7 @@ class TopicsToDBAdapter:
 
         topics_bulk = []
         for author, topic_list in authors_mapping.items():
-            author_record = Author.objects.create_or_update(
+            author_record = Author.objects.create_or_update(  # pylint: disable=no-member
                 nickname=author, profile_link=topic_list[0].author_profile_link
             )
 
@@ -57,6 +58,6 @@ class TopicsToDBAdapter:
         operations = field_update_operations
         result = None
         if operations:
-            result = Topic._get_collection().bulk_write(operations)
+            result = Topic._get_collection().bulk_write(operations)  # pylint: disable=protected-access
 
         return result

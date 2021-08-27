@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from typing import Generator, List
-from random import randint
 
 from scrapper.engine.base import ScrapperMixin
 from scrapper.utils.session import GSession
@@ -33,8 +32,8 @@ class OverclockersScrapper(ScrapperMixin):
             asyncio.set_event_loop(self.loop)
             self._event_loop_set = True
 
-
-    def _generate_page_id(self, start: int, end: int) -> Generator[int, int, None]:
+    @staticmethod
+    def _generate_page_id(start: int, end: int) -> Generator[int, int, None]:
         for i in range(start - 1, end):
             yield i * 40
 
@@ -66,15 +65,15 @@ class OverclockersScrapper(ScrapperMixin):
 
     async def _get_data(self, url, req_params, session, semaphore) -> URLContent:
         data = None
-        response = await session.get(
+        response = await session.get_data(
             url,
             params=req_params,
             semaphore=semaphore,
             timeout=self.r_timeout,
             sleep_on_retry=self.pause
         )
-        if response and response._content:
-            data = {str(response.url): response._content}
+        if response and response.data:
+            data = {str(response.url): response.data}
         return data
 
     def get_topics(self, page_num_start: int, page_num_end: int):
@@ -93,7 +92,7 @@ class OverclockersScrapper(ScrapperMixin):
             else:
                 for data_raw in page.values():
                     data = parser.parse_topics_list(data_raw)
-                    for list_index, item in enumerate(data):
+                    for item in data:
                         item.page_index = page_index
                         topics_listing.append(item)
         return topics_listing
@@ -106,7 +105,7 @@ class OverclockersScrapper(ScrapperMixin):
 
         results_raw = self.loop.run_until_complete(self._fire_requests(urls))
 
-        for page_index, page in enumerate(results_raw):
+        for page in results_raw:
             if isinstance(page, Exception):
                 logging.error(page)
             else:

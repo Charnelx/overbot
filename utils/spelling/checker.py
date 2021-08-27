@@ -1,10 +1,11 @@
+import re
 from functools import lru_cache
 import json
 import os
 
 import nltk
 
-from .constants import Languages
+from .constants import Languages, LettersSet
 
 
 def _load_location_names() -> dict:
@@ -44,17 +45,16 @@ def check_known_location_second_name(location):
 
 
 def create_misspelled_words_list(word: str, language: str) -> set:
-    # Peter Norvig's Spell Correction Algorithm - https://norvig.com/spell-correct.html
-    # TODO: rewrite as Enum
-    if language == Languages.russian.value:
-        letters = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
-    elif language == Languages.ukrainian.value:
-        letters = 'абвгґдеєжзиіїйклмнопрстуфхцчшщьюя'
+    if language == Languages.RUSSIAN.value:
+        letters = LettersSet.RUSSIAN_LETTERS.value
+    elif language == Languages.UKRAINIAN.value:
+        letters = LettersSet.UKRAINIAN_LETTERS.value
     else:
         raise NotImplementedError(f'Unsupported language: {language}')
 
     word = word.lower()
 
+    # Peter Norvig's Spell Correction Algorithm - https://norvig.com/spell-correct.html
     splits = [(word[:i], word[i:]) for i in range(len(word) + 1)]
     deletes = [L + R[1:] for L, R in splits if R]
     transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R) > 1]
@@ -76,6 +76,8 @@ def validate_location(location: str):
         # TODO: need to use coefficients based on words frequencies
         return nltk.edit_distance(locations_pair[0], locations_pair[1], transpositions=True)
 
+    location_pattern = r'[іїє]'
+
     location = location.lower()
 
     # cove case when same location have different name
@@ -86,14 +88,13 @@ def validate_location(location: str):
 
     possible_locations = []
     # naive and straightforward hack to determine language
-    # TODO: use regex functionality
-    if 'і' in location or 'є' in location or 'ї' in location:
+    if re.search(location_pattern, location):
         locations_dict = load_ua_ru_location_names()
         matched_location = locations_dict.get(location)
         if matched_location:
             return matched_location
 
-        misspelled_location_name_variants = create_misspelled_words_list(location, Languages.ukrainian.value)
+        misspelled_location_name_variants = create_misspelled_words_list(location, Languages.UKRAINIAN.value)
         for misspelled_location in misspelled_location_name_variants:
             location_from_dict = locations_dict.get(misspelled_location)
             if location_from_dict:
@@ -106,8 +107,8 @@ def validate_location(location: str):
             return location
 
         # will have to search in both dicts
-        misspelled_location_name_variants_ru = create_misspelled_words_list(location, Languages.russian.value)
-        misspelled_location_name_variants_ukr = create_misspelled_words_list(location, Languages.ukrainian.value)
+        misspelled_location_name_variants_ru = create_misspelled_words_list(location, Languages.RUSSIAN.value)
+        misspelled_location_name_variants_ukr = create_misspelled_words_list(location, Languages.UKRAINIAN.value)
 
         for misspelled_location in misspelled_location_name_variants_ru:
             location_from_dict = locations_dict.get(misspelled_location)

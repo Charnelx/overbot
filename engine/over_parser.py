@@ -41,7 +41,8 @@ class OverclockersParser:
             results.append(data_container)
         return results
 
-    def parse_topic_content(self, page_content: str, url: str):
+    @staticmethod
+    def parse_topic_content(page_content: str, url: str):
         root = HTMLParser(page_content)
         topic_content = root.css_first('.bg1 > .inner > .postbody > * > .content').text()
         topic_closed = bool(root.css_first('.fa-lock'))

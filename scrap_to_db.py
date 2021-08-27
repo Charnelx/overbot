@@ -10,11 +10,11 @@ if __name__ == '__main__':
     adapter.connect()
 
     # excluding some topics to avoid firing redundant requests
-    topics_to_exclude = [topic.topic_id for topic in Topic.objects.fetch_excluded_topics()]
-    topics = list(filter(lambda topic: False if topic.topic_id in topics_to_exclude else True, topics))
+    topics_to_exclude = [topic.topic_id for topic in Topic.objects.fetch_excluded_topics()]  # pylint: disable=no-member
+    topics = list(filter(lambda topic: topic.topic_id not in topics_to_exclude, topics))
     topics_mapping = {t.topic_id: t for t in topics}
 
-    topics_data = scrapper.get_topics_content([(t.url, dict()) for t in topics])
+    topics_data = scrapper.get_topics_content([(t.url, {}) for t in topics])
     for topic in topics_data:
         topic_meta = topics_mapping.get(topic.topic_id)
         topic_meta.topic_content = topic.content
