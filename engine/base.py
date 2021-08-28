@@ -148,7 +148,7 @@ class TopicMetaInfo(DataContainerMixin):
                 'closed': self.closed
             })
             return base_data
-        raise AttributeError('Values was not processed. Call process method.')
+        raise AttributeError('Values was not processed. Call process method first.')
 
 
 @dataclass
