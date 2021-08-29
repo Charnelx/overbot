@@ -103,10 +103,9 @@ class TopicMetaInfo(DataContainerMixin):
         self.location_raw = ','.join(location_pair)
         location_length = len(location_pair)
 
-        # replace country name with regex
         if location_length == 1 and not re.match(self.COUNTRY_PATTERN, location_pair[0]):
             self.location = validate_location(location_pair[0].strip())
-        elif location_length == 2:
+        elif location_length > 1:
             if re.match(self.COUNTRY_PATTERN, location_pair[0]):
                 # example: Украина, Киев
                 location_name = location_pair[1].strip()
@@ -126,8 +125,6 @@ class TopicMetaInfo(DataContainerMixin):
                 # example: Ивано - Франковск
                 location_name = location_name.replace(' ', '')
             self.location = validate_location(location_name)
-        else:
-            self.location = None
 
         self.title = self.title.split(']')[1].strip()
 

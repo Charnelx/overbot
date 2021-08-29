@@ -93,6 +93,13 @@ class TestTopicMetaInfo:
         assert topic.processed is True
         assert topic.location == 'ивано-франковск'
 
+    def test_location_separated_by_multiple_commas(self, create_topic_meta_info):
+        topic = create_topic_meta_info(title='[Украина, рівне, львів] GeForce for mining!')
+        topic.process()
+
+        assert topic.processed is True
+        assert topic.location == 'ровно'
+
     def test_to_json_without_process_first(self, create_topic_meta_info):
         topic = create_topic_meta_info()
 
