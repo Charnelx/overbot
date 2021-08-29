@@ -4,7 +4,7 @@ from scrapper.models.adapters import Topic, TopicsToDBAdapter
 
 if __name__ == '__main__':
     scrapper = OverclockersScrapper()
-    topics = scrapper.get_topics(1, 6)
+    topics = scrapper.get_topics(1, 10)
 
     adapter = TopicsToDBAdapter()
     adapter.connect()

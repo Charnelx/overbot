@@ -82,15 +82,23 @@ class TopicMetaInfo(DataContainerMixin):
     closed: bool = False
 
     def process(self) -> None:
-        relative_path = self.url.split('.', 1)[1].rsplit('&', 1)[0]
+        if 'sid' in self.url:
+            relative_path = self.url.split('.', 1)[1].rsplit('&', 1)[0]
+        else:
+            relative_path = self.url.split('.', 1)[1]
         self.url = f'{self.domain}{relative_path}'
         self.posts_count = int(self.posts_count.strip())
         self.views_count = int(self.views_count.strip())
         self.last_post_timestamp = datetime.strptime(self.last_post_timestamp, '%Y-%m-%dT%H:%M:%S%z')
         self.topic_id = self.parse_topic_id(path=relative_path)
-        self.author_profile_link = self.author_profile_link.split('.', 1)[1].rsplit('&', 1)[0]
+        self.author = self.author.strip()
+        if 'sid' in self.author_profile_link:
+            self.author_profile_link = self.author_profile_link.split('.', 1)[1].rsplit('&', 1)[0]
+        else:
+            self.author_profile_link = self.author_profile_link.split('.', 1)[1]
         self.author_profile_link = f'{self.domain}{self.author_profile_link}'
 
+        self.title = self.title.strip()
         location_pair = self.title.split(']', maxsplit=1)[0].strip('[').split(',')
         self.location_raw = ','.join(location_pair)
         location_length = len(location_pair)

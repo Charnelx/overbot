@@ -143,3 +143,17 @@ class TestTopicMetaInfo:
             'topic_id': 1000,
             'views_count': 100
         }
+
+
+class TestTopicData:
+
+    def test_process(self, create_topic_data):
+        topic_data = create_topic_data(url='./viewtopic.php?f=26&t=1000')
+        topic_data.process()
+
+        assert topic_data.topic_id == 1000
+
+    def test_no_process_called(self, create_topic_data):
+        topic_data = create_topic_data(url='./viewtopic.php?f=26&t=1000')
+
+        assert topic_data.topic_id is None
