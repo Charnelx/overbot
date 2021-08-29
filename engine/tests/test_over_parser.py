@@ -1,3 +1,5 @@
+# pylint: disable=no-self-use
+
 from datetime import datetime, timezone
 
 from scrapper.engine.over_parser import OverclockersParser

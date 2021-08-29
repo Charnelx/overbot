@@ -26,6 +26,7 @@ if __name__ == '__main__':
         upserted_records = result.upserted_count
         inserted_records = result.inserted_count
 
-        print(f'Modified: {modified_records}\nUpserted: {upserted_records}\nInserted: {inserted_records}')
+        print(f'Excluded: {len(topics_to_exclude)}\nModified: {modified_records}\nUpserted: {upserted_records}\n'
+              f'Inserted: {inserted_records}')
     else:
         print('No updates')
