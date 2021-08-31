@@ -8,3 +8,4 @@ pylint-runner=0.60
 selectolax=0.3.1
 pytest=6.2.4
 coverage=5.5
+pytest-asyncio=0.15.1
