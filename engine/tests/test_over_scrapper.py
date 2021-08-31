@@ -1,4 +1,6 @@
 # pylint: disable=no-self-use
+# pylint: disable=protected-access
+
 from asyncio import ProactorEventLoop
 from unittest import mock
 import logging
@@ -20,15 +22,15 @@ class TestOverclockersScrapper:
         assert scrapper._event_loop_set is True
         assert isinstance(scrapper.loop, ProactorEventLoop)
 
-    @pytest.mark.parametrize('page_number', [num for num in range(1, 10)])
+    @pytest.mark.parametrize('page_number', list(range(1, 10)))
     def test__generate_page_id(self, page_number):
         scrapper = OverclockersScrapper()
-        pages = [page_index for page_index in scrapper._generate_page_id(1, page_number)]
+        pages = list(scrapper._generate_page_id(1, page_number))
 
         assert len(pages) == page_number
         assert all(filter(lambda idx: idx % 40, pages)) is True
 
-    @pytest.mark.parametrize('page_number', [num for num in range(1, 10)])
+    @pytest.mark.parametrize('page_number', list(range(1, 10)))
     def test__generate_listing_urls(self, page_number):
         scrapper = OverclockersScrapper()
         url_pairs = scrapper._generate_listing_urls(1, page_number)
@@ -52,7 +54,7 @@ class TestOverclockersScrapper:
         assert len(result) == 1
         assert result[0] == expected_result
 
-    @pytest.mark.parametrize('page_number', [num for num in range(1, 10)])
+    @pytest.mark.parametrize('page_number', list(range(1, 10)))
     def test_get_topics(self, page_number):
         scrapper = OverclockersScrapper()
 
@@ -67,7 +69,7 @@ class TestOverclockersScrapper:
         assert len(result) == page_number
         assert result[-1].page_index == page_number - 1
 
-    @pytest.mark.parametrize('page_number', [num for num in range(1, 10)])
+    @pytest.mark.parametrize('page_number', list(range(1, 10)))
     def test_get_topics_on_exception(self, page_number, caplog):
         caplog.set_level(logging.ERROR)
 
@@ -84,7 +86,7 @@ class TestOverclockersScrapper:
         assert caplog.messages[0] == 'Something happened'
         assert len(result) == 0
 
-    @pytest.mark.parametrize('page_number', [num for num in range(1, 10)])
+    @pytest.mark.parametrize('page_number', list(range(1, 10)))
     def test_get_topics_content(self, page_number):
         scrapper = OverclockersScrapper()
 
@@ -98,8 +100,7 @@ class TestOverclockersScrapper:
         assert parser_result.called is True
         assert len(result) == page_number
 
-    @pytest.mark.parametrize('page_number', [num for num in range(1, 10)])
-    def test_get_topics_content_on_exception(self, page_number, caplog):
+    def test_get_topics_content_on_exception(self, caplog):
         caplog.set_level(logging.ERROR)
 
         scrapper = OverclockersScrapper()
@@ -118,6 +119,8 @@ class TestOverclockersScrapper:
     @pytest.mark.asyncio
     async def test_get_data(self):
 
+        # pylint: disable=unused-argument
+        # pylint: disable=too-few-public-methods
         async def fake_get_data(*args, **kwargs):
             class FakeResponse:
                 data = 'some_data'
