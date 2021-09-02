@@ -21,7 +21,7 @@ class RequestAsyncContextManager:
     async def __aenter__(self):
         return self
 
-    async def __aexit__(self, exc_type, exc, tb):
+    async def __aexit__(self, exc_type, exc, traceback):
         await asyncio.sleep(0)
 
     async def text(self):

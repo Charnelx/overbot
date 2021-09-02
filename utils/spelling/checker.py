@@ -80,7 +80,6 @@ def validate_location(location: str):
         validate_location('харьсков') -> харьков
     """
     def calculate_levenshtein_distance(locations_pair: tuple):
-        # TODO: need to use coefficients based on words frequencies
         user_input = locations_pair[0]
         prediction = locations_pair[1]
         distance = nltk.edit_distance(user_input, prediction, transpositions=True)

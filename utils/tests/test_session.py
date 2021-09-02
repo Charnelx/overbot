@@ -55,7 +55,7 @@ class TestGSession:
 
         waiting = create_async_request_context_manager(
             content_type='application/json',
-            result=dict(),
+            result={},
             raise_error=True
         )
 
@@ -81,7 +81,7 @@ class TestGSession:
 
         waiting = create_async_request_context_manager(
             content_type='application/json',
-            result=dict(),
+            result={},
             raise_error=True
         )
 
@@ -109,7 +109,7 @@ class TestGSession:
 
         waiting = create_async_request_context_manager(
             content_type='application/json',
-            result=dict(),
+            result={},
             raise_error=True
         )
 
@@ -136,7 +136,7 @@ class TestGSession:
 
         waiting = create_async_request_context_manager(
             content_type='application/json',
-            result=dict(),
+            result={},
             raise_error=True,
             exception=Exception
         )
