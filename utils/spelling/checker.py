@@ -8,9 +8,9 @@ import nltk
 from .constants import Languages, LettersSet
 
 
-def _load_location_names() -> dict:
+def _load_json_data(path: str) -> dict:
     working_dir = os.path.abspath(os.path.dirname(__file__))
-    file_path = os.path.join(working_dir, './resources/locations.json')
+    file_path = os.path.join(working_dir, path)
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
     return json.loads(content)
@@ -18,16 +18,22 @@ def _load_location_names() -> dict:
 
 @lru_cache(maxsize=None)
 def load_ru_ua_location_names() -> dict:
-    data = _load_location_names()
+    data = _load_json_data('./resources/locations.json')
     locations = {item['name']['ru'].lower(): item['name']['uk'].lower() for item in data}
     return locations
 
 
 @lru_cache(maxsize=None)
 def load_ua_ru_location_names() -> dict:
-    data = _load_location_names()
+    data = _load_json_data('./resources/locations.json')
     locations = {item['name']['uk'].lower(): item['name']['ru'].lower() for item in data}
     return locations
+
+
+@lru_cache(maxsize=None)
+def load_locations_frequencies() -> dict:
+    data = _load_json_data('./resources/locations_freq.json')
+    return data
 
 
 def check_known_location_second_name(location):
@@ -39,7 +45,8 @@ def check_known_location_second_name(location):
         'днепродзержинск': 'каменское',
         'виница': 'винница',
         'волынь': 'волынь',
-        'рівне': 'ровно'
+        'рівне': 'ровно',
+        'черкаси': 'черкассы'
     }
     return hardcoded_locations.get(location)
 
@@ -74,7 +81,13 @@ def validate_location(location: str):
     """
     def calculate_levenshtein_distance(locations_pair: tuple):
         # TODO: need to use coefficients based on words frequencies
-        return nltk.edit_distance(locations_pair[0], locations_pair[1], transpositions=True)
+        user_input = locations_pair[0]
+        prediction = locations_pair[1]
+        distance = nltk.edit_distance(user_input, prediction, transpositions=True)
+        if distance > 0:
+            freq = load_locations_frequencies().get(prediction, 0)
+            distance -= freq
+        return distance
 
     location_pattern = r'[іїє]'
 
