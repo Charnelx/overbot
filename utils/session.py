@@ -18,11 +18,8 @@ class GSession(aiohttp.ClientSession):
     ):
         retries = 0
 
-        semaphore = semaphore if semaphore else fake_semaphore()
-        retry_num = kwargs.pop('retry_num', 3)
-
         while True:
-            async with semaphore:
+            async with semaphore if semaphore else fake_semaphore():
                 try:
                     async with super().get(url, allow_redirects=allow_redirects, **kwargs) as response:
                         if response.content_type == 'application/json':
@@ -41,7 +38,7 @@ class GSession(aiohttp.ClientSession):
                         ) from err
                     if sleep_on_retry:
                         logger.info(
-                            'GET request waiting %i sec for %s to retry (%i of %i})',
+                            'GET request waiting %i sec for %s to retry (%i of %i)',
                             sleep_on_retry, url, retries, retry_num
                         )
                         await asyncio.sleep(sleep_on_retry)
