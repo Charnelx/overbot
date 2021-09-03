@@ -1,7 +1,8 @@
-import re
 from functools import lru_cache
 import json
 import os
+import re
+from typing import Optional
 
 import nltk
 
@@ -36,7 +37,10 @@ def load_locations_frequencies() -> dict:
     return data
 
 
-def check_known_location_second_name(location):
+def check_known_location_second_name(location: str):
+    # hardcoded list of frequent mistakes in locations
+    # naming that can't be constructed by create_misspelled_words_list
+    # method
     hardcoded_locations = {
         'днепр': 'днипро',
         'днепропетровск': 'днипро',
@@ -70,7 +74,7 @@ def create_misspelled_words_list(word: str, language: str) -> set:
     return set(deletes + transposes + replaces + inserts)
 
 
-def validate_location(location: str):
+def validate_location(location: str) -> Optional[str]:
     """
     This method used to correct misspelled location names by creating a 1-Levenshtein distance
     words set from provided location name and searching for closest (appropriate) name from dictionary.
@@ -110,8 +114,8 @@ def validate_location(location: str):
         for misspelled_location in misspelled_location_name_variants:
             location_from_dict = locations_dict.get(misspelled_location)
             if location_from_dict:
-                # this return tuple of (provided location, rus location name from dict)
-                return misspelled_location
+                # return rus location for ukrainian input
+                return location_from_dict
     else:
         locations_dict = load_ru_ua_location_names()
         matched_location = locations_dict.get(location)
