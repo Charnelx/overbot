@@ -10,10 +10,8 @@ class AuthorQuerySet(QuerySet):
         Create or update Author record and return it back to caller.
         This used in topics bulk upsert/update logic.
         """
-        docs_count = self(nickname=nickname).update(set__profile_link=profile_link, upsert=True)
-        if docs_count:
-            return self.get(nickname=nickname)
-        return None
+        self(nickname=nickname).update(set__profile_link=profile_link, upsert=True)
+        return self.get(nickname=nickname)
 
 
 class TopicQuerySet(QuerySet):
@@ -24,10 +22,11 @@ class TopicQuerySet(QuerySet):
         """
         Return Topic ID's that needs to be excluded (no requests for topic page content scrapping)
         """
+        date_limit = datetime.utcnow() - timedelta(minutes=time_limit)
         return self.filter(
             Q(posts_count__gte=max_posts_count) |
             Q(views_count__gte=max_views_count) |
-            Q(updated__gte=datetime.now() - timedelta(minutes=time_limit)) |
+            Q(updated__gte=date_limit) |
             Q(closed=True) |
             Q(location=None)
         ).only('topic_id')
