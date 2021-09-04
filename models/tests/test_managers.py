@@ -1,4 +1,9 @@
-from datetime import datetime, timedelta
+# pylint: disable=no-self-use
+# pylint: disable=no-member
+# pylint: disable=protected-access
+# pylint: disable=too-few-public-methods
+
+from datetime import timedelta
 
 from mongoengine.errors import ValidationError
 from mongomock.helpers import utcnow

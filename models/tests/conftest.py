@@ -1,3 +1,7 @@
+# pylint: disable=unused-argument
+# pylint: disable=redefined-outer-name
+# pylint: disable=too-many-arguments
+
 from random import randint
 
 from mongoengine import connect, disconnect
