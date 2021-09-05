@@ -3,10 +3,10 @@ fake-useragent==0.1.11
 nltk==3.6.2
 pymongo==3.12.0
 mongoengine==0.23.1
-pylint=2.10.2
-pylint-runner=0.60
-selectolax=0.3.1
-pytest=6.2.4
-coverage=5.5
-pytest-asyncio=0.15.1
-mongomock=3.23.0
+pylint==2.10.2
+pylint-runner==0.6.0
+selectolax==0.3.1
+pytest==6.2.4
+coverage==5.5
+pytest-asyncio==0.15.1
+mongomock==3.23.0
