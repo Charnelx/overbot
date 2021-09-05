@@ -4,6 +4,7 @@ from typing import List
 
 from mongoengine import connect
 import pymongo
+from pymongo.results import BulkWriteResult
 
 from scrapper.engine.base import TopicMetaInfo
 from scrapper.settings import settings
@@ -16,15 +17,16 @@ class TopicsToDBAdapter:
         self.connection = None
 
     def connect(self):
-        db_settings = settings.SCRAPPER_DATABASES['default']
-        self.connection = connect(
-            db=db_settings.get('db_name'),
-            host=db_settings.get('host'),
-            port=db_settings.get('port')
-        )
+        if not self.connection:
+            db_settings = settings.SCRAPPER_DATABASES['default']
+            self.connection = connect(
+                db=db_settings.get('db_name'),
+                host=db_settings.get('host'),
+                port=db_settings.get('port')
+            )
 
     @staticmethod
-    def import_topics_to_db(topics: List[TopicMetaInfo]):
+    def import_topics_to_db(topics: List[TopicMetaInfo]) -> BulkWriteResult:
         authors_mapping = defaultdict(list)
         # trick for optimization - allows to create/update author
         # only one's for a group of topics
@@ -33,6 +35,8 @@ class TopicsToDBAdapter:
 
         topics_bulk = []
         for author, topic_list in authors_mapping.items():
+            # note that Author record will be created/updated anyway even if
+            # bulk Topic's write operation fail
             author_record = Author.objects.create_or_update(  # pylint: disable=no-member
                 nickname=author, profile_link=topic_list[0].author_profile_link
             )

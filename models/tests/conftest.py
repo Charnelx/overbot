@@ -2,7 +2,11 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=too-many-arguments
 
+from unittest import mock
+from pathlib import Path
+import pkgutil
 from random import randint
+import sys
 
 from mongoengine import connect, disconnect
 from mongomock.helpers import utcnow
@@ -11,8 +15,37 @@ import pytest
 from scrapper.models.overclockers_models import Author, Topic
 
 
-@pytest.fixture
-def mocked_db_connection(scope='function'):
+@pytest.fixture(scope='function')
+def mock_adapter_db_settings(monkeypatch):
+    settings_mock = mock.Mock()
+    settings_mock.SCRAPPER_DATABASES = {
+        'default': {
+            'db': 'mongoenginetest',
+            'host': 'mongomock://localhost',
+            'port': None
+        }
+    }
+
+    monkeypatch.setattr(sys.modules['scrapper.models.adapters'], 'settings', settings_mock)
+
+
+@pytest.fixture(scope='function')
+def mock_db_connection_on_module_level(monkeypatch):
+    level_up_path = Path(globals().get('__package__')).stem
+    modules = [name for _, name, _ in pkgutil.iter_modules([str(Path(__file__).parent.absolute().parent.absolute())])]
+    modules_path = []
+    for module in modules:
+        modules_path.append(f'{level_up_path}.{module}')
+
+    for path in modules_path:
+        try:
+            monkeypatch.setattr(sys.modules[path], 'connect', lambda *args, **kwargs: True)
+        except AttributeError:
+            pass
+
+
+@pytest.fixture(scope='function')
+def mocked_db_connection():
     connect('mongoenginetest', host='mongomock://localhost')
     yield None
     disconnect()

@@ -135,7 +135,7 @@ class TestTopicMetaInfo:
             'title': 'Title',
             'topic_content': None,
             'topic_id': 1000,
-            'url': 'forum.example.com/viewtopic.php?f=26&t=1000',
+            'url': 'https://forum.example.com/viewtopic.php?f=26&t=1000',
             'views_count': 100
         }
 
