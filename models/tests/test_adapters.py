@@ -1,3 +1,8 @@
+# pylint: disable=no-self-use
+# pylint: disable=no-member
+# pylint: disable=protected-access
+# pylint: disable=too-few-public-methods
+
 from random import randint
 
 import pytest
@@ -5,7 +10,7 @@ import pytest
 from ..adapters import TopicsToDBAdapter
 from ..overclockers_models import Author, Topic
 
-
+# pylint: disable=unused-argument
 @pytest.mark.usefixtures("mocked_db_connection")
 @pytest.mark.usefixtures("mock_db_connection_on_module_level")
 class TestTopicsToDBAdapter:
