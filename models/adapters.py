@@ -24,6 +24,7 @@ class TopicsToDBAdapter:
                 host=db_settings.get('host'),
                 port=db_settings.get('port')
             )
+        return self.connection
 
     @staticmethod
     def import_topics_to_db(topics: List[TopicMetaInfo]) -> BulkWriteResult:

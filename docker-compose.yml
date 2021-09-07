@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  scrapper:
+    restart: "no"
+    container_name: scrapper
+    build: .
+    depends_on:
+      - mongodb
+    env_file: .env
+    networks:
+      - net1
+    tty: true
+    command: python3 scrap_to_db.py
+
+  mongodb:
+    image: mongo:latest
+    restart: unless-stopped
+    container_name: mongodb
+    volumes:
+      - mongodb_data_container:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - net1
+
+volumes:
+  mongodb_data_container:
+
+networks:
+  net1:
+    driver: bridge
