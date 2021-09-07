@@ -11,7 +11,7 @@ services:
     networks:
       - net1
     tty: true
-    command: python3 scrap_to_db.py
+    command: /bin/sh "entrypoint.sh"
 
   mongodb:
     image: mongo:latest
